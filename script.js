@@ -12,6 +12,7 @@ const formEL = document.querySelector(".form");
 const feedsEL = document.querySelector(".feedbacks");
 const submitEL = document.querySelector(".submit-btn");
 const spinnerEL = document.querySelector(".spinner");
+const hashtagListEL = document.querySelector(".hashtags");
 
 const renderFeedbackItem = (feedback) => {
   const feedItem = `
@@ -125,3 +126,45 @@ fetch(`${BASE_API_URL}/feedbacks`)
   .catch((error) => {
     feedsEL.textContent = `failed to fetch feedback items. Error message: ${error.message}`;
   });
+
+const clickHandler = (event) => {
+  const clickedEL = event.target;
+  const upvoteEL = clickedEL.className.includes("upvote");
+
+  if (upvoteEL) {
+    const upvoteBtnEl = clickedEL.closest(".upvote");
+    upvoteBtnEl.disabled = true;
+
+    const upvoteCountEl = upvoteBtnEl.querySelector(".upvote__count");
+    let upvoteCount = +upvoteBtnEl.textContent;
+
+    upvoteCountEl.textContent = ++upvoteCount;
+  } else {
+  }
+  clickedEL.closest(".feedback").classList.toggle("feedback--expand");
+};
+
+feedsEL.addEventListener("click", clickHandler);
+
+const hashtagClickHandler = (event) => {
+  const clickedEl = event.target;
+  if (clickedEl.className === "hashtags") return;
+
+  const companyNameFromHastag = clickedEl.textContent.substring(1).trim();
+
+  feedsEL.childNodes.forEach((childNode) => {
+    if (childNode.nodeType === 3) return;
+
+    const companyNameFromFeedbackItem = childNode
+      .querySelector(".feedback__company")
+      .textContent.toLowerCase()
+      .trim();
+
+    if (
+      companyNameFromHastag.toLowerCase().trim() !== companyNameFromFeedbackItem
+    ) {
+      childNode.remove();
+    }
+  });
+};
+hashtagListEL.addEventListener("click", hashtagClickHandler);
